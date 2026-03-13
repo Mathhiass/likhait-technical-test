@@ -133,7 +133,8 @@ GEM
     minitest (6.0.1)
       prism (~> 1.5)
     msgpack (1.8.0)
-    mysql2 (0.5.6)
+    mysql2 (0.5.7)
+      bigdecimal
     net-imap (0.6.2)
       date
       net-protocol
@@ -145,6 +146,8 @@ GEM
       net-protocol
     nio4r (2.7.5)
     nokogiri (1.19.0-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.19.0-x64-mingw-ucrt)
       racc (~> 1.4)
     parallel (1.27.0)
     parser (3.3.10.0)
@@ -266,6 +269,8 @@ GEM
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2026.1)
+      tzinfo (>= 1.0.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
@@ -278,6 +283,7 @@ GEM
 
 PLATFORMS
   arm64-darwin
+  x64-mingw-ucrt
 
 DEPENDENCIES
   bootsnap
@@ -286,7 +292,7 @@ DEPENDENCIES
   debug
   factory_bot_rails
   faker
-  mysql2 (~> 0.5)
+  mysql2 (~> 0.5.6)
   puma (>= 5.0)
   rack-cors
   rails (~> 7.2.2, >= 7.2.2.2)
@@ -296,7 +302,7 @@ DEPENDENCIES
   tzinfo-data
 
 RUBY VERSION
-   ruby 3.3.7p123
+   ruby 3.3.10p183
 
 BUNDLED WITH
    2.6.8

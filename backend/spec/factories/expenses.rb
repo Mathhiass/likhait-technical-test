@@ -4,5 +4,6 @@ FactoryBot.define do
     amount { "9.99" }
     category { nil }
     payer_name { "MyString" }
+    date { Date.today }
   end
 end

@@ -140,11 +140,12 @@ while current_date <= end_date
       # Add some decimal variation
       amount += rand(0..99) / 100.0
 
-      # Create the expense with created_at set to the date
+      # Create the expense with date set to the current_date
       Expense.create!(
         description: template[:description],
         amount: amount,
         category: category,
+        payer_name: "User",
         date: current_date,
         created_at: current_date,
         updated_at: current_date

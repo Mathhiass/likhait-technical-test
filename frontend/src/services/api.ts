@@ -58,6 +58,7 @@ export async function createExpense(data: ExpenseFormData): Promise<Expense> {
     description: data.description,
     amount: data.amount,
     category_id: category?.id,
+    payer_name: "User",
     date: data.date,
   };
 
