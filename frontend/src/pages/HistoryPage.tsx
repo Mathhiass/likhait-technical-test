@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense } from "../services/api";
+import { getExpenses, createExpense, fetchCategories } from "../services/api";
 import { Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
@@ -13,6 +13,7 @@ const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState<Array<{ id: number; name: string }>>([]);
 
   // Get year and month from URL params, default to current date if not provided
   const getInitialYearMonth = () => {
@@ -47,6 +48,7 @@ const HistoryPage: React.FC = () => {
 
   useEffect(() => {
     fetchExpenses();
+    fetchCategoriesList();
   }, [selectedYear, selectedMonth]);
 
   const fetchExpenses = async () => {
@@ -58,6 +60,15 @@ const HistoryPage: React.FC = () => {
       console.error("Error fetching expenses:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategoriesList = async () => {
+    try {
+      const data = await fetchCategories();
+      setAvailableCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -96,11 +107,11 @@ const HistoryPage: React.FC = () => {
     {} as Record<string, { category: string; amount: number; count: number }>,
   );
 
-  const categories = Object.values(categoryData).sort(
+  const categoryBreakdown = Object.values(categoryData).sort(
     (a, b) => b.amount - a.amount,
   );
-  const total = categories.reduce((sum, cat) => sum + cat.amount, 0);
-  const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
+  const total = categoryBreakdown.reduce((sum, cat) => sum + cat.amount, 0);
+  const totalCount = categoryBreakdown.reduce((sum, cat) => sum + cat.count, 0);
 
   const pageStyle: React.CSSProperties = {
     padding: "48px 64px",
@@ -165,7 +176,7 @@ const HistoryPage: React.FC = () => {
         ) : (
           <>
             <CategoryBreakdown
-              categories={categories}
+              categories={categoryBreakdown}
               total={total}
               totalCount={totalCount}
             />
@@ -187,6 +198,8 @@ const HistoryPage: React.FC = () => {
         <ExpenseForm
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
+          categories={availableCategories}
+          onCategoryAdded={fetchCategoriesList}
         />
       </Modal>
     </div>

@@ -39,7 +39,8 @@ RSpec.describe "Api::Expenses", type: :request do
             description: "Team Lunch",
             amount: 150.50,
             category_id: food_category.id,
-            payer_name: "User"
+            payer_name: "User",
+            date: Date.today.to_s
           }
         }
       end
@@ -63,15 +64,18 @@ RSpec.describe "Api::Expenses", type: :request do
             description: "Invalid expense",
             amount: -100.00,
             category_id: food_category.id,
-            payer_name: "User"
+            payer_name: "User",
+            date: Date.today.to_s
           }
         }
 
         expect {
           post "/api/expenses", params: invalid_params, as: :json
-        }.to change(Expense, :count).by(1)
+        }.to change(Expense, :count).by(0)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to include("Amount must be greater than 0")
       end
 
       it "with empty descriptions" do
@@ -80,15 +84,38 @@ RSpec.describe "Api::Expenses", type: :request do
             description: "",
             amount: 100.00,
             category_id: food_category.id,
-            payer_name: "User"
+            payer_name: "User",
+            date: Date.today.to_s
           }
         }
 
         expect {
           post "/api/expenses", params: invalid_params, as: :json
-        }.to change(Expense, :count).by(1)
+        }.to change(Expense, :count).by(0)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to include("Description can't be blank")
+      end
+
+      it "with future dates" do
+        invalid_params = {
+          expense: {
+            description: "Future expense",
+            amount: 100.00,
+            category_id: food_category.id,
+            payer_name: "User",
+            date: (Date.today + 1.day).to_s
+          }
+        }
+
+        expect {
+          post "/api/expenses", params: invalid_params, as: :json
+        }.to change(Expense, :count).by(0)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to include("Date cannot be in the future")
       end
     end
   end
